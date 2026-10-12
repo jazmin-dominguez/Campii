@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños, Diego Campillo! ⚽✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Quicksand:wght@400;500;650;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-cream: #FBF9F5;
+            --card-white: #FFFFFF;
+            --soft-red: #D9383E;
+            --deep-red: #B3242A;
+            --text-main: #2C2C2C;
+            --text-muted: #7A7A7A;
+            --border-aesthetic: #EFECE6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px;
+            background-image: radial-gradient(#e5e0d8 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
+            overflow: hidden; /* Oculta scroll mientras está la pregunta inicial */
+        }
+
+        /* --- PANTALLA DE LA PREGUNTA (MODAL INICIAL) --- */
+        #question-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(251, 249, 245, 0.96);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        .question-modal {
+            background: var(--card-white);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            border: 1.5px solid var(--border-aesthetic);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: popIn 0.6s ease-out forwards;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .question-modal h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .question-modal p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 25px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .btn-choice {
+            border: none;
+            padding: 12px 35px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-yes {
+            background-color: var(--soft-red);
+            color: white;
+            box-shadow: 0 5px 15px rgba(217, 56, 62, 0.3);
+        }
+
+        .btn-yes:hover {
+            background-color: var(--deep-red);
+            transform: translateY(-3px);
+        }
+
+        .btn-no {
+            background-color: #EFECE6;
+            color: var(--text-muted);
+        }
+
+        .btn-no:hover {
+            background-color: #e0dbd3;
+        }
+
+        #no-message {
+            display: none;
+            color: var(--soft-red);
+            font-size: 0.9rem;
+            margin-top: 15px;
+            font-weight: 600;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* --- CONTENIDO PRINCIPAL (OCULTO AL INICIO) --- */
+        #main-content {
+            display: none;
+            width: 100%;
+            max-width: 700px;
+            background: var(--card-white);
+            padding: 40px;
+            border-radius: 28px;
+            box-shadow: 0 15px 45px rgba(217, 56, 62, 0.08);
+            border: 2px solid var(--border-aesthetic);
+            position: relative;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header-section h1 span {
+            color: var(--soft-red);
+            font-style: italic;
+        }
+
+        .subtitle-tag {
+            display: inline-block;
+            background: #FFF1F1;
+            color: var(--soft-red);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+            border: 1px solid #ffdcdc;
+        }
+
+        .polaroid-frame {
+            background: white;
+            padding: 15px 15px 25px 15px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-aesthetic);
+            margin-bottom: 30px;
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            background: #F4F2EE;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.85);
+            color: var(--soft-red);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .carousel-btn:hover {
+            background-color: var(--soft-red);
+            color: white;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .prev-btn { left: 12px; }
+        .next-btn { right: 12px; }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #ddd;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: var(--soft-red);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* --- SECCIÓN DEL MENSAJE ESTILO CARTA PINTEREST --- */
+        .letter-container {
+            background: #FAF7F2;
+            border: 1px solid #EBE4DA;
+            padding: 30px;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .letter-text {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: #333333;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .letter-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed #dcd5cc;
+            padding-top: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .letter-footer span {
+            font-weight: 600;
+            color: var(--deep-red);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #b5b0a8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VISTA INICIAL: Pregunta del CM -->
+    <div id="question-overlay">
+        <div class="question-modal">
+            <h2>¿Oye Campi? ⚽</h2>
+            <p>Antes de ver tu sorpresa... ¿ya perdonaste al CM?</p>
+            <div id="no-message">¡Intenta de nuevo, por favor! 🤭</div>
+            <div class="buttons-container">
+                <button class="btn-choice btn-yes" onclick="answerYes()">SI</button>
+                <button class="btn-choice btn-no" onclick="answerNo()">NO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-wrapper" id="main-content">
+        <div class="header-section">
+            <h1>¡Feliz Cumpleaños, <span>Diego Campillo</span>!</h1>
+            <div class="subtitle-tag">✨ Edición Especial • para CAMPI ✨</div>
+        </div>
+
+        <div class="polaroid-frame">
+            <div class="carousel-container" id="carousel">
+                <div class="carousel-slide active"><img src="Diego Campillo (1).jpg" alt="Edit 1"></div>
+                <div class="carousel-slide"><img src="Diego Campillo (2).jpg" alt="Edit 2"></div>
+                <div class="carousel-slide"><img src="Campi (1).jpg" alt="Edit 3"></div>
+                <div class="carousel-slide"><img src="Diego Campillo (4).jpg" alt="Edit 4"></div>
+                <div class="carousel-slide"><img src="Diego Campillo.jpg" alt="Edit 5"></div>
+                <div class="carousel-slide"><img src="Campi.jpg" alt="Edit 6"></div>
+                <div class="carousel-slide"><img src="diego campillo (3).jpg" alt="Edit 7"></div>
+                <div class="carousel-slide"><img src="Diego Campillo (5).jpg" alt="Edit 8"></div>
+                <div class="carousel-slide"><img src="851110029625800153.jpg" alt="Edit 9"></div>
+
+                <button class="carousel-btn prev-btn" onclick="changeSlide(-1)">&#10094;</button>
+                <button class="carousel-btn next-btn" onclick="changeSlide(1)">&#10095;</button>
+            </div>
+
+            <div class="carousel-dots" id="dots-container"></div>
+        </div>
+
+        <!-- Mensaje de la Fanbase -->
+        <div class="letter-container">
+            <p class="letter-text">
+                "Hola Campi, posiblemente no leas esto o a lo mejor posiblemente también lo recibas, no sé jjj. Solo quiero decirte que tal vez no estuve en tus comienzos y tampoco en tus momentos más difíciles, pero prometo estar hasta el final, hasta que sigas metiendo muchos goles más, hasta que sigas defendiendo a tu equipo, hasta todas las asistencias que hagas, literal hasta el final. Muchas gracias por cruzarte en mi camino de verdad, cada vez que veo un video tuyo, me da una inmensa alegría y esperanza de que yo también podré lograr lo que quiera. jjj graciasss."
+            </p>
+
+            <div class="letter-footer">
+                <div>
+                    <span>De parte de una futura Ing. de Software 💻❤️</span> <br>
+                    <span>✨ cuando quieras una plataforma web llamame jjj</span>
+                </div>
+                <span>✨ 18 de Octubre</span>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            Hecho con amor, código y admistración total
+        </div>
+    </div>
+
+    <script>
+        // Función al hacer clic en "SI"
+        function answerYes() {
+            const overlay = document.getElementById('question-overlay');
+            overlay.style.opacity = '0';
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                document.body.style.overflow = 'auto'; // Habilita el scroll
+
+                // Lluvia de corazones coreanos
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.5 },
+                    colors: ['#D9383E', '#FFB6C1', '#FFFFFF', '#0b2265', '#D4AF37'],
+                    shapes: ['heart'],
+                    scalar: 1.2
+                });
+            }, 800);
+        }
+
+        // Función al hacer clic en "NO"
+        function answerNo() {
+            const noMessage = document.getElementById('no-message');
+            noMessage.style.display = 'block';
+        }
+
+        // Lógica del Carrusel
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dotsContainer = document.getElementById('dots-container');
+        let slideInterval;
+
+        slides.forEach((_, index) => {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                updateCarousel(currentSlide);
+                resetTimer();
+            });
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function updateCarousel(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            currentSlide = (currentSlide + direction + slides.length) % slides.length;
+            updateCarousel(currentSlide);
+            resetTimer();
+        }
+
+        function startAutoplay() {
+            slideInterval = setInterval(() => {
+                currentSlide = (currentSlide + 1) % slides.length;
+                updateCarousel(currentSlide);
+            }, 3500);
+        }
+
+        function resetTimer() {
+            clearInterval(slideInterval);
+            startAutoplay();
+        }
+
+        startAutoplay();
+    </script>
+</body>
+</html>
